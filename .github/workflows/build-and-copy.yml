@@ -1,4 +1,3 @@
-
 name: Build and Copy to Warehouse
 
 on:
@@ -12,12 +11,12 @@ jobs:
 
     steps:
       - name: Checkout inventory-dashboard
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Install dependencies
         run: npm install
@@ -25,21 +24,21 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Checkout wearehouse-eight
-        uses: actions/checkout@v3
+      - name: Checkout wearehouse
+        uses: actions/checkout@v4
         with:
-          repository: tabrisyuen-svg/wearehouse-eight
+          repository: tabrisyuen-svg/wearehouse
           token: ${{ secrets.DEPLOY_TOKEN }}
-          path: wearehouse-eight
+          path: wearehouse
 
       - name: Copy dist to shop-sync
         run: |
-          rm -rf wearehouse-eight/shop-sync
-          cp -r dist/ wearehouse-eight/shop-sync
+          rm -rf wearehouse/shop-sync
+          cp -r dist/ wearehouse/shop-sync
 
-      - name: Push to wearehouse-eight
+      - name: Push to wearehouse
         run: |
-          cd wearehouse-eight
+          cd wearehouse
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add shop-sync/
