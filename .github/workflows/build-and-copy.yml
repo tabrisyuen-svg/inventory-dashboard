@@ -1,1 +1,47 @@
 
+name: Build and Copy to Warehouse
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout inventory-dashboard
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Checkout wearehouse-eight
+        uses: actions/checkout@v3
+        with:
+          repository: tabrisyuen-svg/wearehouse-eight
+          token: ${{ secrets.DEPLOY_TOKEN }}
+          path: wearehouse-eight
+
+      - name: Copy dist to shop-sync
+        run: |
+          rm -rf wearehouse-eight/shop-sync
+          cp -r dist/ wearehouse-eight/shop-sync
+
+      - name: Push to wearehouse-eight
+        run: |
+          cd wearehouse-eight
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add shop-sync/
+          git commit -m "Auto: update shop-sync from inventory-dashboard build"
+          git push
